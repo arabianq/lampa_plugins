@@ -2,15 +2,22 @@
     'use strict';
 
     function getAccounts() {
-        let accs = Lampa.Storage.get('lampac_saved_accounts', []);
-        if (typeof accs === 'string') {
-            try {
-                accs = JSON.parse(accs);
-            } catch (e) {
-                accs = [];
+        let data = Lampa.Storage.get('lampac_saved_accounts', []);
+        let accs = [];
+        
+        if (typeof data === 'string') {
+            try { accs = JSON.parse(data); } catch(e) { accs = []; }
+        } else {
+            accs = data;
+        }
+        
+        let result = [];
+        if (accs && typeof accs === 'object' && accs.length !== undefined) {
+            for (let i = 0; i < accs.length; i++) {
+                if (accs[i] && accs[i].id) result.push(accs[i]);
             }
         }
-        return Array.isArray(accs) ? accs : [];
+        return result;
     }
 
     function saveAccounts(accs) {
