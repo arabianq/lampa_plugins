@@ -2,17 +2,19 @@
     'use strict';
 
     function getAccounts() {
-        let accs = Lampa.Storage.get('lampac_saved_accounts', '[]');
-        try {
-            accs = JSON.parse(accs);
-        } catch (e) {
-            accs = [];
+        let accs = Lampa.Storage.get('lampac_saved_accounts', []);
+        if (typeof accs === 'string') {
+            try {
+                accs = JSON.parse(accs);
+            } catch (e) {
+                accs = [];
+            }
         }
         return Array.isArray(accs) ? accs : [];
     }
 
     function saveAccounts(accs) {
-        Lampa.Storage.set('lampac_saved_accounts', JSON.stringify(accs));
+        Lampa.Storage.set('lampac_saved_accounts', accs);
     }
 
     function addAccount(id, name) {
@@ -32,7 +34,10 @@
     function backupCurrentAccount() {
         let current_id = Lampa.Storage.get('lampac_unic_id', '');
         if (current_id) {
-            addAccount(current_id, 'Основной (' + current_id.substring(0, 4) + ')');
+            let accs = getAccounts();
+            if (!accs.find(a => a.id === current_id)) {
+                addAccount(current_id, 'Основной (' + current_id.substring(0, 4) + ')');
+            }
         }
     }
 
@@ -48,9 +53,11 @@
         </div>
         `;
 
-        $('.head__actions').append(btn_html);
+        if ($('.account--switcher').length === 0) {
+            $('.head__actions').append(btn_html);
+        }
 
-        $('.account--switcher').on('hover:enter click', function () {
+        $('.account--switcher').unbind('hover:enter click').on('hover:enter click', function () {
             showMainMenu();
         });
     }
