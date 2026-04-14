@@ -1,6 +1,11 @@
 (function () {
     'use strict';
 
+    if (window.lampac_accounts_manager) {
+        return;
+    }
+    window.lampac_accounts_manager = true;
+    
     function getAccounts() {
         let data = Lampa.Storage.get('lampac_saved_accounts', []);
         let accs = [];
